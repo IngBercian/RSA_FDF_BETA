@@ -45,7 +45,7 @@
 		if($result > 0){
 			while ($data = mysqli_fetch_array($query)) {
 				# code...
-				$dui = $data['dui'];
+				$telefono = $data['telefono'];
 				$familia = $data['familia'];
 			}
 		}else{
@@ -71,7 +71,7 @@
 		<div class="data_delete">
 			<h2>¿Está seguro de eliminar el siguiente registro?</h2>
 			<p>Familia: <span><?php echo $familia; ?></span></p>
-			<p>DUI: <span><?php echo $dui; ?></span></p>
+			<p>Telefono: <span><?php echo $telefono; ?></span></p>
 
 			<form method="post" action="">
 				<input type="hidden" name="idfamilia" value="<?php echo $idfamilia; ?>">

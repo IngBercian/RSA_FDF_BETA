@@ -10,41 +10,41 @@
 	if(!empty($_POST))
 	{
 		$alert='';
-		if(empty($_POST['familia']) || empty($_POST['telefono']) || empty($_POST['donativo']))
+		if(empty($_POST['familia']) || empty($_POST['telefono']) || empty($_POST['donativo']) || empty($_POST['plan']))
 		{
 			$alert='<p class="msg_error">Todos los campos son obligatorios.</p>';
 		}else{
 
 			$idFamilia = $_POST['idFamilia'];
-			$dui = $_POST['dui'];
 			$familia = $_POST['familia'];
 			$telefono  = $_POST['telefono'];
 			$donativo   = $_POST['donativo'];
+			$plan = $_POST['plan'];
 
             $result = 0;
 
-            if(is_numeric($dui) and $dui !=0)
+            if(is_numeric($telefono) and $telefono !=0)
 
             {
 
-            $query = mysqli_query($conection,"SELECT * FROM familia WHERE (dui = $dui AND codfamilia != $idFamilia)");
+            $query = mysqli_query($conection,"SELECT * FROM familia WHERE (telefono = $telefono AND codfamilia != $idFamilia)");
 
 		    $result = mysqli_fetch_array($query);
 
             }
 
 			if($result > 0){
-				$alert='<p class="msg_error">El DUI ya fue registrado.</p>';
+				$alert='<p class="msg_error">El telefono ya fue registrado.</p>';
 			}else{
 
-				if($dui == '')
+				if($telefono == '')
                  {
-                 	$dui = 0;
+                 	$telefono = 0;
                  }
 				
 
 			$sql_update = mysqli_query($conection,"UPDATE familia
-															SET dui = '$dui', familia='$familia', telefono='$telefono',donativo='$donativo'
+															SET familia='$familia', telefono='$telefono',donativo='$donativo',plan='$plan'
 															WHERE codFamilia= $idFamilia ");
 		    
 				if($sql_update){
@@ -68,32 +68,45 @@
 	}
 	$idUser = $_REQUEST['cod'];
 
-	$sql= mysqli_query($conection,"SELECT * FROM familia 
-								   WHERE codfamilia= $idUser ");
+	$sql= mysqli_query($conection,"SELECT * FROM familia u
+									INNER JOIN plan r
+									on u.plan = r.idplan
+									WHERE codfamilia= $idUser ");
+
 	mysqli_close($conection);
 	$result_sql = mysqli_num_rows($sql);
 
 	if($result_sql == 0){
 		header('Location: lista_familias.php');
 	}else{
-
-		while ($data = mysqli_fetch_array($sql)) {
-			# code...
-			$idUser  = $data['codfamilia'];
-			$dui  = $data['dui'];
-			$familia  = $data['familia'];
-			$telefono = $data['telefono'];
-			$donativo   = $data['donativo'];
-
-		
-
-
-
-
+			$option = '';
+			while ($data = mysqli_fetch_array($sql)) {
+				# code...
+				$idUser  = $data['codfamilia'];
+			    $familia  = $data['familia'];
+			    $telefono = $data['telefono'];
+				$donativo   = $data['donativo'];
+				$idplan   = $data['idplan'];
+				$plan    = $data['plan'];
+	
+				if($idplan == 1){
+					$option = '<option value="'.$idplan.'" select>'.$plan.'</option>';
+				}else if($idplan == 1){
+					$option = '<option value="'.$idplan.'" select>'.$plan.'</option>';	
+				}else if($idplan == 2){
+					$option = '<option value="'.$idplan.'" select>'.$plan.'</option>';
+				}else if($idplan == 3){
+					$option = '<option value="'.$idplan.'" select>'.$plan.'</option>';
+				}else if($idplan == 4){
+					$option = '<option value="'.$idplan.'" select>'.$plan.'</option>';
+				}else if($idplan == 5){
+					$option = '<option value="'.$idplan.'" select>'.$plan.'</option>';
+				}
+	
+			}
 		}
-	}
-
- ?>
+	
+	 ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -113,15 +126,38 @@
 
 			<form action="" method="post">
 				<input type="hidden" name="idFamilia" value="<?php echo $idUser; ?>">
-				<label for="dui">DUI</label>
-				<input type="number" name="dui" id="dui" placeholder="Número de DUI" value="<?php echo $dui; ?>">
 				<label for="familia">Familia</label>
-				<input type="text" name="familia" id="familia" placeholder="Apellidos padre/madre"value="<?php echo $familia; ?>">
+				<input type="text" name="familia" id="familia" placeholder="Apellidos"value="<?php echo $familia; ?>">
 				<label for="telefono">Telefono</label>
 				<input type="number" name="telefono" id="telefono" placeholder="Teléfono"value="<?php echo $telefono; ?>">
-				<label for="donativo">Donativo</label>
-				<input type="number" name="donativo" id="donativo" placeholder="Donativo anual"value="<?php echo $donativo; ?>">
+				<label for="donativo">Ofrenda</label>
+				<input type="number" name="donativo" id="donativo" placeholder="Ofrenda"value="<?php echo $donativo; ?>">
+				<label for="plan">Plan</label>
 				
+				<?php 
+					include "../conexion.php";
+					$query_plan = mysqli_query($conection,"SELECT * FROM plan");
+					mysqli_close($conection);
+					$result_plan = mysqli_num_rows($query_plan);
+
+				 ?>
+
+				<select name="plan" id="plan" class="notItemOne">
+					<?php
+						echo $option; 
+						if($result_plan > 0)
+						{
+							while ($plan = mysqli_fetch_array($query_plan)) {
+					?>
+							<option value="<?php echo $plan["idplan"]; ?>"><?php echo $plan["plan"] ?></option>
+					<?php 
+								# code...
+							}
+							
+						}
+					 ?>
+				</select>
+
 				<input type="submit" value="Actualizar Familia" class="btn_save">
 
 			</form>

@@ -36,7 +36,8 @@
 				<!--<th>ID</th>-->
 				<th>Familia</th>
 				<th>Teléfono</th>
-				<th>Ofrenda de Fe</th>
+				<th>Ofrenda</th>
+				<th>Plan</th>
 				<th>Acciones</th>
 			</tr>
 		<?php 
@@ -57,8 +58,10 @@
 			$desde = ($pagina-1) * $por_pagina;
 			$total_paginas = ceil($total_registro / $por_pagina);
 
-			$query = mysqli_query($conection,"SELECT * FROM familia          
-				                              WHERE estatus = 1 AND usuario_id = $_SESSION[iduser]  ORDER BY codfamilia ASC LIMIT $desde,$por_pagina 
+                /*$query = mysqli_query($conection,"SELECT * FROM familia          
+				WHERE estatus = 1 AND usuario_id = $_SESSION[iduser]  ORDER BY codfamilia ASC LIMIT $desde,$por_pagina 
+				");*/
+				$query = mysqli_query($conection,"SELECT * FROM familia u INNER JOIN plan r ON u.plan = r.idplan WHERE estatus = 1 AND usuario_id = $_SESSION[iduser] ORDER BY u.codfamilia ASC LIMIT $desde,$por_pagina 
 				");
 
 			mysqli_close($conection);
@@ -84,6 +87,7 @@
 					<td><?php echo $data['familia']; ?></td>
 					<td><?php echo $data['telefono']; ?></td>
 					<td><?php echo $data['donativo']; ?></td>
+					<td><?php echo $data['plan']; ?></td>
 					<!--<td><?php echo $fecha->format('d-m-Y'); ?></td>-->
 					<td>
 						<a class="link_edit" href="editar_familia.php?cod=<?php echo $data['codfamilia']; ?>">Editar
